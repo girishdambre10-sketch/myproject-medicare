@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import AdminLogin from "./components/AdminLogin";
 import AdminRegister from "./components/AdminRegister";
@@ -17,7 +17,7 @@ import UpdateMedicine from "./components/UpdateMedicine";
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route exact path="/" element={<Dashboard />} />
         <Route exact path="/login" element={<AdminLogin />} />
@@ -33,7 +33,7 @@ function App() {
         <Route exact path="/addmedicine" element={<AddMedicine />} />
         <Route exact path="/updatemedicine" element={<UpdateMedicine />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

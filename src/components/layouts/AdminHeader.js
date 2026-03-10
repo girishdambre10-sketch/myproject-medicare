@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../../firebase";
 import { signOut } from "firebase/auth";
 
+
 export default function AdminHeader(props) {
   const [userName, setUserName] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
@@ -58,7 +59,7 @@ export default function AdminHeader(props) {
                   className="dropdown-toggle profile-pic">
                   {" "}
                   <img
-                    src={`assets/img/profile4.jpg`}
+                    src={`public/assets/img/profile4.jpg`}
                     alt="user-img"
                     width="36"
                     className="img-circle"

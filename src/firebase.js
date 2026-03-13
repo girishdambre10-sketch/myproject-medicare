@@ -1,19 +1,22 @@
+// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyCfgEgJXgFVCNvEtMrGwq1Cz4brF2CNC7g",
-  authDomain: "medicare-react-f4673.firebaseapp.com",
-  projectId: "medicare-react-f4673",
-  storageBucket: "medicare-react-f4673.appspot.com",
-  messagingSenderId: "655234591254",
-  appId: "1:655234591254:web:b7538f00826bbe3d6ce337",
-  measurementId: "G-89KF8GPSWY",
+  apiKey: "AIzaSyD-T5OB_BW78KN-2YzQUAaqlYuIihhJMq0",
+  authDomain: "pharmarx-b99ac.firebaseapp.com",
+  projectId: "pharmarx-b99ac",
+  storageBucket: "pharmarx-b99ac.firebasestorage.app",
+  messagingSenderId: "576131556029",
+  appId: "1:576131556029:web:e647b878373926609f8dd4",
+  measurementId: "G-ERGV0MFD3T"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth();
-
-export { app, auth, db };
+export const auth = getAuth(app);
+export default app;

@@ -118,6 +118,101 @@ const styles = `
   .empty-icon { font-size: 40px; margin-bottom: 12px; }
   .search-filter-bar { display: flex; gap: 10px; margin-bottom: 18px; align-items: center; flex-wrap: wrap; }
   .tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 500; background: var(--primary-light); color: var(--primary); }
+
+  /* ── MOBILE RESPONSIVE ── */
+  @media (max-width: 768px) {
+    :root { --sidebar-w: 0px; }
+
+    /* Hide sidebar on mobile */
+    .sidebar { display: none; }
+
+    /* Main takes full width */
+    .main { margin-left: 0; padding-bottom: 70px; }
+
+    /* Topbar adjustments */
+    .topbar { padding: 12px 16px; gap: 10px; }
+    .topbar-title { font-size: 15px; }
+    .topbar-search { width: 140px; padding: 6px 10px; }
+    .topbar-search input { font-size: 12px; }
+
+    /* Page padding */
+    .page { padding: 16px; }
+
+    /* Stats: 2 columns on mobile */
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+    .stat-card { padding: 14px; }
+    .stat-value { font-size: 20px; }
+
+    /* Grid 2 becomes single column */
+    .grid-2 { grid-template-columns: 1fr; gap: 14px; }
+
+    /* Category grid: 2 cols on mobile */
+    .cat-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+    /* Type grid: 2 cols on mobile */
+    .type-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+    /* Tables scroll horizontally */
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { min-width: 600px; }
+
+    /* Search filter bar stacks */
+    .search-filter-bar { gap: 8px; }
+    .search-filter-bar input { max-width: 100% !important; flex: 1 !important; }
+
+    /* Profile header stacks */
+    .profile-header { flex-direction: column; text-align: center; padding: 20px; }
+    .profile-header button { margin-left: 0 !important; width: 100%; justify-content: center; }
+
+    /* Card header wraps */
+    .card-header { flex-wrap: wrap; gap: 8px; }
+
+    /* Bottom navigation for mobile */
+    .mobile-nav {
+      display: flex !important;
+      position: fixed;
+      bottom: 0; left: 0; right: 0; width: 100%;
+      background: #0a1628;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      z-index: 9999;
+      padding: 6px 0 env(safe-area-inset-bottom, 8px);
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+    }
+    .mobile-nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      cursor: pointer; padding: 6px 10px; border-radius: 10px;
+      color: rgba(255,255,255,0.45); font-size: 10px; font-weight: 500;
+      border: none; background: none; transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif; min-width: 52px;
+    }
+    .mobile-nav-item.active {
+      color: #1e6fff;
+      background: rgba(30,111,255,0.12);
+    }
+    .mobile-nav-item .mn-icon { font-size: 22px; line-height: 1; }
+    .mobile-nav-badge {
+      position: absolute; top: -3px; right: -4px;
+      background: #ff4757; color: #fff; font-size: 9px;
+      font-weight: 700; padding: 1px 5px; border-radius: 20px;
+      border: 1.5px solid #0a1628;
+    }
+    .mn-icon-wrap { position: relative; display: inline-flex; }
+  }
+
+  /* Desktop: hide mobile nav */
+  .mobile-nav { display: none; }
+
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .stat-value { font-size: 18px; }
+    .stat-label { font-size: 11px; }
+    .topbar-search { display: none; }
+    .cat-grid { grid-template-columns: repeat(2, 1fr); }
+    .type-grid { grid-template-columns: 1fr 1fr; }
+    .page { padding: 12px; }
+  }
 `;
 
 const CAT_ICONS = {
@@ -852,6 +947,32 @@ export default function PharmacyApp() {
           {page === "type" && <MedicineType inventory={inventory} />}
           {page === "profile" && <Profile onLogout={handleLogout} />}
         </div>
+
+        {/* ── MOBILE BOTTOM NAV ── */}
+        <div className="mobile-nav">
+          {[
+            { id: "dashboard", icon: "📊", label: "Home" },
+            { id: "inventory", icon: "📦", label: "Stock" },
+            { id: "category", icon: "🏷️", label: "Category" },
+            { id: "type", icon: "💊", label: "Types" },
+            { id: "profile", icon: "👤", label: "Profile" },
+          ].map(p => (
+            <button
+              key={p.id}
+              className={`mobile-nav-item${page === p.id ? " active" : ""}`}
+              onClick={() => setPage(p.id)}
+            >
+              <div className="mn-icon-wrap">
+                <span className="mn-icon">{p.icon}</span>
+                {p.id === "inventory" && lowCount > 0 && (
+                  <span className="mobile-nav-badge">{lowCount}</span>
+                )}
+              </div>
+              <span>{p.label}</span>
+            </button>
+          ))}
+        </div>
+
       </div>
     </>
   );

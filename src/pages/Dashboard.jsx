@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom"; 
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
@@ -368,19 +369,80 @@ const TYPE_COLORS = {
   Softgel: "#f0e6ff", Ointment: "#e6f7ff", Drops: "#e6faf5", Powder: "#f0f0f0",
 };
 
-// ─── COMPONENTS ──────────────────────────────────────────────────────────────
 function Modal({ title, onClose, children, footer }) {
-  return (
-    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal">
-        <div className="modal-header">
-          <span className="modal-title">{title}</span>
-          <button className="icon-btn" onClick={onClose} style={{ border: "none" }}>✖️</button>
+  return createPortal(
+    <div
+      onClick={e => e.target === e.currentTarget && onClose()}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(10,22,40,0.6)",
+        zIndex: 99999,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: "'DM Sans', sans-serif",
+      }}
+    >
+      <div
+        style={{
+          background: "#ffffff",
+          borderRadius: 16,
+          width: 560,
+          maxWidth: "95vw",
+          maxHeight: "90vh",
+          overflowY: "auto",
+          boxShadow: "0 8px 40px rgba(0,0,0,0.25)",
+        }}
+      >
+        {/* HEADER */}
+        <div style={{
+          padding: "20px 24px",
+          borderBottom: "1px solid #e2e8f0",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}>
+          <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 16, fontWeight: 700, color: "#1a2332" }}>
+            {title}
+          </span>
+          <button onClick={onClose} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 18, color: "#6b7a90" }}>✖️</button>
         </div>
-        <div className="modal-body">{children}</div>
-        {footer && <div className="modal-footer">{footer}</div>}
+
+        {/* BODY */}
+        <div style={{ padding: 24 }}>
+          {/* inject scoped styles for form elements */}
+          <style>{`
+            .pm-form-group { margin-bottom: 16px; }
+            .pm-form-label { display: block; font-size: 11px; font-weight: 600; color: #6b7a90; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+            .pm-form-control { width: 100%; padding: 9px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13.5px; font-family: 'DM Sans',sans-serif; color: #1a2332; background: #fff; outline: none; box-sizing: border-box; }
+            .pm-form-control:focus { border-color: #1e6fff; box-shadow: 0 0 0 3px rgba(30,111,255,0.1); }
+            .pm-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+            .pm-form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+            .pm-btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; font-family: 'DM Sans',sans-serif; }
+            .pm-btn-primary { background: #1e6fff; color: #fff; }
+            .pm-btn-primary:hover { background: #1558d6; }
+            .pm-btn-outline { background: transparent; border: 1px solid #e2e8f0; color: #1a2332; }
+            .pm-btn-outline:hover { border-color: #1e6fff; color: #1e6fff; }
+          `}</style>
+          {children}
+        </div>
+
+        {/* FOOTER */}
+        {footer && (
+          <div style={{
+            padding: "16px 24px",
+            borderTop: "1px solid #e2e8f0",
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 10,
+          }}>
+            {footer}
+          </div>
+        )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -549,7 +611,7 @@ function Dashboard({ inventory }) {
   );
 }
 
-// ─── INVENTORY ────────────────────────────────────────────────────────────────
+//----Inventory--------------
 function Inventory({ inventory, setInventory }) {
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("");
@@ -564,7 +626,7 @@ function Inventory({ inventory, setInventory }) {
     (!filterType || i.type === filterType)
   );
 
-  const openAdd = () => { setEditItem(null); setForm({ name: "", category: "", type: "", stock: "", price: "", expiry: "", supplier: "" }); setShowModal(true); };
+  const openAdd = () => {console.log("openAdd clicked!"); setEditItem(null); setForm({ name: "", category: "", type: "", stock: "", price: "", expiry: "", supplier: "" }); setShowModal(true); };
   const openEdit = (item) => { setEditItem(item); setForm({ ...item, stock: String(item.stock), price: String(item.price) }); setShowModal(true); };
   const handleDelete = (id) => { if (window.confirm("Delete this medicine?")) setInventory(prev => prev.filter(i => i.id !== id)); };
   const handleSave = () => {
@@ -575,6 +637,74 @@ function Inventory({ inventory, setInventory }) {
       setInventory(prev => [...prev, { ...form, id: Date.now(), stock: +form.stock, price: +form.price }]);
     }
     setShowModal(false);
+  };
+
+  // ── ADD THIS FUNCTION ──
+  const handlePrint = () => {
+    const printContent = `
+      <html>
+      <head>
+        <title>PharmaRx - Medicine Inventory</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; color: #1a2332; }
+          h2 { color: #1e6fff; margin-bottom: 4px; }
+          p { color: #6b7a90; font-size: 13px; margin-bottom: 16px; }
+          table { width: 100%; border-collapse: collapse; font-size: 13px; }
+          th { background: #f0f4f8; padding: 10px 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7a90; border-bottom: 2px solid #e2e8f0; }
+          td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; }
+          tr:last-child td { border-bottom: none; }
+          .badge { padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+          .good { background: #e6faf5; color: #00a67d; }
+          .low { background: #fff4e6; color: #e68a00; }
+          .critical { background: #ffe8e8; color: #ff4757; }
+          .footer { margin-top: 24px; font-size: 12px; color: #6b7a90; text-align: right; }
+        </style>
+      </head>
+      <body>
+        <h2>💊 PharmaRx — Medicine Inventory</h2>
+        <p>Generated on: ${new Date().toLocaleString()} &nbsp;|&nbsp; Total: ${filtered.length} medicines</p>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Medicine Name</th>
+              <th>Category</th>
+              <th>Type</th>
+              <th>Stock</th>
+              <th>Price (₹)</th>
+              <th>Expiry</th>
+              <th>Supplier</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filtered.map((item, idx) => {
+              const status = item.stock < 100 ? `<span class="badge critical">Critical</span>`
+                : item.stock < 300 ? `<span class="badge low">Low</span>`
+                : `<span class="badge good">Good</span>`;
+              return `
+                <tr>
+                  <td>${idx + 1}</td>
+                  <td><strong>${item.name}</strong></td>
+                  <td>${item.category}</td>
+                  <td>${item.type}</td>
+                  <td>${item.stock}</td>
+                  <td>₹${item.price}</td>
+                  <td>${item.expiry}</td>
+                  <td>${item.supplier}</td>
+                  <td>${status}</td>
+                </tr>`;
+            }).join("")}
+          </tbody>
+        </table>
+        <div class="footer">PharmaRx Pharmacy Management System</div>
+      </body>
+      </html>
+    `;
+    const win = window.open("", "_blank");
+    win.document.write(printContent);
+    win.document.close();
+    win.print();
   };
 
   return (
@@ -589,9 +719,17 @@ function Inventory({ inventory, setInventory }) {
           <option value="">All Types</option>
           {MEDICINE_TYPES.map(t => <option key={t}>{t}</option>)}
         </select>
-        <button className="btn btn-primary" onClick={openAdd}>{ICONS.add} Add Medicine</button>
+
+        {/* ── ADD THESE TWO BUTTONS ── */}
+        <button className="btn btn-outline" onClick={handlePrint}>
+          🖨️ Print
+        </button>
+        <button className="btn btn-primary" onClick={openAdd}>
+          ➕ Add Medicine
+        </button>
       </div>
 
+      {/* rest of your JSX stays exactly the same below... */}
       <div className="card">
         <div className="card-header">
           <span className="card-title">📦 Medicine Inventory ({filtered.length})</span>

@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/myproject-medicare/static/js/main.466bf77b.js",
+    "main.js": "/myproject-medicare/static/js/main.b12a1d6f.js",
     "index.html": "/myproject-medicare/index.html",
-    "main.466bf77b.js.map": "/myproject-medicare/static/js/main.466bf77b.js.map"
+    "main.b12a1d6f.js.map": "/myproject-medicare/static/js/main.b12a1d6f.js.map"
   },
   "entrypoints": [
-    "static/js/main.466bf77b.js"
+    "static/js/main.b12a1d6f.js"
   ]
 }
